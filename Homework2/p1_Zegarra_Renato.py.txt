@@ -1,0 +1,105 @@
+1. def line_number(input_file: str, output_file: str) -> None:
+2.     """Write numbered lines from one text file to another."""
+3.     try:
+4.         infile = open(input_file, "r")
+5.         outfile = open(output_file, "w")
+6. 
+7.         number = 1
+8. 
+9.         for line in infile:
+10.             outfile.write("{}. {}".format(number, line))
+11.             number += 1
+12. 
+13.         infile.close()
+14.         outfile.close()
+15. 
+16.     except Exception:
+17.         print("Error reading or writing the file.")
+18.         raise
+19. 
+20. 
+21. def parse_functions(filename: str) -> tuple:
+22.     """Parse functions from a Python file and return their information."""
+23.     try:
+24.         infile = open(filename, "r")
+25.         lines = infile.readlines()
+26.         infile.close()
+27. 
+28.         functions = []
+29. 
+30.         for i in range(len(lines)):
+31.             line = lines[i]
+32. 
+33.             if line.startswith("def "):
+34.                 function_line = i + 1
+35. 
+36.                 left_paren = line.find("(")
+37.                 right_paren = line.find(")")
+38. 
+39.                 function_name = line[4:left_paren]
+40.                 arguments = line[left_paren + 1:right_paren]
+41. 
+42.                 if "#" in line:
+43.                     function_code = line[:line.find("#")].rstrip() + "\n"
+44.                 else:
+45.                     function_code = line
+46. 
+47.                 j = i + 1
+48. 
+49.                 while j < len(lines):
+50.                     current_line = lines[j]
+51. 
+52.                     if current_line.strip() != "":
+53.                         if not current_line.startswith(" ") \
+54.                                 and not current_line.startswith("\t"):
+55.                             break
+56. 
+57.                     if current_line.strip() != "":
+58.                         if not current_line.strip().startswith("#"):
+59.                             if "#" in current_line:
+60.                                 current_line = (
+61.                                     current_line[:current_line.find("#")]
+62.                                     .rstrip() + "\n"
+63.                                 )
+64. 
+65.                             if current_line.strip() != "":
+66.                                 function_code += current_line
+67. 
+68.                     j += 1
+69. 
+70.                 functions.append(
+71.                     (
+72.                         function_line,
+73.                         function_name,
+74.                         arguments,
+75.                         function_code
+76.                     )
+77.                 )
+78. 
+79.         functions.sort(key=lambda item: item[1])
+80. 
+81.         return tuple(functions)
+82. 
+83.     except Exception:
+84.         print("Error reading or parsing the Python file.")
+85.         raise
+86. 
+87. 
+88. def main() -> None:
+89.     """Test line_number and parse_functions on this Python file."""
+90.     input_file = __file__
+91.     output_file = __file__ + ".txt"
+92. 
+93.     line_number(input_file, output_file)
+94. 
+95.     print("Numbered file created:")
+96.     print(output_file)
+97. 
+98.     functions = parse_functions(input_file)
+99. 
+100.     print("\nParsed functions:")
+101.     print(functions)
+102. 
+103. 
+104. if __name__ == "__main__":
+105.     main()
